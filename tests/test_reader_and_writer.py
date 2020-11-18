@@ -10,10 +10,11 @@ class NsqTest(BaseTest):
         self.topic = 'foo'
         self.host = '127.0.0.1'
         self.port = 4150
+        self.auth_secret = 'test_secret'
         super().setUp()
 
     @run_until_complete
-    async def test_writer(self):
+    async def test_01_writer(self):
         nsq = await create_writer(host=self.host, port=self.port,
                                   heartbeat_interval=30000,
                                   feature_negotiation=True,
@@ -21,13 +22,14 @@ class NsqTest(BaseTest):
                                   snappy=False,
                                   deflate=False,
                                   deflate_level=0,
-                                  loop=self.loop)
+                                  loop=self.loop,
+                                  auth_secret=self.auth_secret)
         for i in range(10):
             pub_res = await nsq.pub('foo', 'bar')
             self.assertEqual(pub_res, b"OK")
 
     @run_until_complete
-    async def test_reader(self):
+    async def test_02_reader(self):
         nsq = await create_reader(nsqd_tcp_addresses=[
             f"{self.host}:{self.port}"],
             heartbeat_interval=30000,
@@ -36,7 +38,8 @@ class NsqTest(BaseTest):
             snappy=False,
             deflate=False,
             deflate_level=0,
-            loop=self.loop)
+            loop=self.loop,
+            auth_secret=self.auth_secret)
         await nsq.subscribe('foo', 'bar')
         num = 0
         async for msg in nsq.messages():
