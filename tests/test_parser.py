@@ -41,8 +41,8 @@ class ParserTest(unittest.TestCase):
 
     def test_chunked_read(self):
         msg = b'\x00\x00\x00&\x00\x00\x00\x02\x13\x8c4\xcd\x01x~\x83' \
-              b'\x00\x0106f6cbf50539f004test_msg\x00\x00\x00\x0f\x00' \
-              b'\x00\x00\x00_heartbeat_'
+                  b'\x00\x0106f6cbf50539f004test_msg\x00\x00\x00\x0f\x00' \
+                  b'\x00\x00\x00_heartbeat_'
 
         responses = []
 

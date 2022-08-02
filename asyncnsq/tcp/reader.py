@@ -88,7 +88,6 @@ class Reader:
             because lookupd must find a topic to find nsqds
             so, lookupd connect changed in to subscribe func
             """
-            pass
         if self._nsqd_tcp_addresses:
             for host, port in self._nsqd_tcp_addresses:
                 conn = await create_connection(
@@ -128,7 +127,7 @@ class Reader:
         for producer in res['producers']:
             host = producer['broadcast_address']
             port = producer['tcp_port']
-            tmp_id = "tcp://{}:{}".format(host, port)
+            tmp_id = f"tcp://{host}:{port}"
             if tmp_id not in self._connections:
                 logger.debug(('host, port', host, port))
                 conn = await create_connection(
@@ -162,16 +161,14 @@ class Reader:
             raise ValueError('You must subscribe to the topic first')
 
         while self._is_subscribe:
-            fut = self._loop.create_task(self._queue.get())
-            yield fut
+            yield self._loop.create_task(self._queue.get())
 
     async def messages(self):
         if not self._is_subscribe:
             raise ValueError('You must subscribe to the topic first')
 
         while self._is_subscribe:
-            result = await self._queue.get()
-            yield result
+            yield await self._queue.get()
 
     async def _redistribute(self):
         while self._is_subscribe:

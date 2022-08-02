@@ -113,16 +113,15 @@ class Writer:
         timeout_generator = retry_iterator(init_delay=0.1, max_delay=10.0)
         while True:
             logger.debug("autoreconnect check loop")
-            if not (self._status == consts.CONNECTED):
+            if self._status != consts.CONNECTED:
                 logger.debug(
                     f"writer close({self._status})detected,reconnect")
                 conn_id = self.id if self._conn else 'init'
-                logger.info('reconnect writer{}'.format(conn_id))
+                logger.info(f'reconnect writer{conn_id}')
                 try:
                     await self.reconnect()
                 except ConnectionError:
-                    logger.error("Can not connect to: {}:{} ".format(
-                        self._host, self._port))
+                    logger.error(f"Can not connect to: {self._host}:{self._port} ")
                 else:
                     self._status = consts.CONNECTED
             t = next(timeout_generator)
@@ -130,8 +129,7 @@ class Writer:
 
     async def execute(self, command, *args, data=None):
         if self._conn.closed:
-            logger.debug(
-                f"execute found conn closed, reconnect()")
+            logger.debug("execute found conn closed, reconnect()")
             await self.reconnect()
         response = self._conn.execute(command, *args, data=data)
         return await response
@@ -196,4 +194,4 @@ class Writer:
         self._status = consts.CLOSED
 
     def __repr__(self):
-        return '<Writer{}>'.format(self._conn.__repr__())
+        return f'<Writer{self._conn.__repr__()}>'

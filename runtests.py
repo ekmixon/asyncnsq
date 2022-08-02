@@ -137,9 +137,11 @@ class TestsFinder:
         mods = [mod for mod, _ in load_modules(self._testsdir,
                                                verbose=self._verbose)]
         for mod in mods:
-            for name in set(dir(mod)):
-                if name.endswith('Test'):
-                    self._test_factories.append(getattr(mod, name))
+            self._test_factories.extend(
+                getattr(mod, name)
+                for name in set(dir(mod))
+                if name.endswith('Test')
+            )
 
     def load_tests(self):
         """
@@ -180,8 +182,9 @@ class TestResult(unittest.TextTestResult):
         if gc.garbage:
             if self.showAll:
                 self.stream.writeln(
-                    "    Warning: test created {} uncollectable "
-                    "object(s).".format(len(gc.garbage)))
+                    f"    Warning: test created {len(gc.garbage)} uncollectable object(s)."
+                )
+
             # move the uncollectable objects somewhere so we don't see
             # them again
             self.leaks.append((self.getDescription(test), gc.garbage[:]))
@@ -194,7 +197,7 @@ class TestRunner(unittest.TextTestRunner):
     def run(self, test):
         result = super().run(test)
         if result.leaks:
-            self.stream.writeln("{} tests leaks:".format(len(result.leaks)))
+            self.stream.writeln(f"{len(result.leaks)} tests leaks:")
             for name, leaks in result.leaks:
                 self.stream.writeln(' '*4 + name + ':')
                 for leak in leaks:
@@ -223,7 +226,7 @@ def runtests():
 
     testsdir = os.path.abspath(args.testsdir)
     if not os.path.isdir(testsdir):
-        print("Tests directory is not found: {}\n".format(testsdir))
+        print(f"Tests directory is not found: {testsdir}\n")
         ARGS.print_help()
         return
 
@@ -284,7 +287,7 @@ def runtests():
             cov.report(show_missing=False)
             here = os.path.dirname(os.path.abspath(__file__))
             print("\nFor html report:")
-            print("open file://{}/htmlcov/index.html".format(here))
+            print(f"open file://{here}/htmlcov/index.html")
 
 
 if __name__ == '__main__':

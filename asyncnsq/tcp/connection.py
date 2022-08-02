@@ -79,7 +79,7 @@ class TcpConnection:
             self._cmd_waiters.append((fut, cb))
 
         command_raw = self._parser.encode_command(command, *args, data=data)
-        logger.debug('execute command %s' % command_raw)
+        logger.debug(f'execute command {command_raw}')
         self._writer.write(command_raw)
 
         # track all processed and requeued messages
@@ -93,7 +93,7 @@ class TcpConnection:
 
     @property
     def endpoint(self):
-        return "tcp://{}:{}".format(self._host, self._port)
+        return f"tcp://{self._host}:{self._port}"
 
     @property
     def id(self):
@@ -145,7 +145,7 @@ class TcpConnection:
     def _do_close(self, exc=None):
         print("this is the going close info")
         if exc:
-            logger.error("Connection closed with error: {}".format(exc))
+            logger.error(f"Connection closed with error: {exc}")
         if self._closed:
             return
         self._closed = True
@@ -174,13 +174,13 @@ class TcpConnection:
             server_hostname=self._host)
         bin_ok = await self._reader.readexactly(10)
         if bin_ok != consts.BIN_OK:
-            raise RuntimeError('Upgrade to TLS failed, got: {}'.format(bin_ok))
+            raise RuntimeError(f'Upgrade to TLS failed, got: {bin_ok}')
         self._reader_task = asyncio.Task(self._read_data(), loop=self._loop)
         self._reader_task.add_done_callback(self._on_reader_task_stopped)
 
     def _on_reader_task_stopped(self, future):
         exc = future.exception()
-        logger.error('DONE: TASK {}'.format(exc))
+        logger.error(f'DONE: TASK {exc}')
 
     def _upgrade_to_snappy(self):
         self._parser = SnappyReader(self._parser.buffer)
@@ -206,7 +206,7 @@ class TcpConnection:
                 break
             except Exception as exc:
                 logger.exception(exc)
-                logger.debug("Reader task stopped due to: {}".format(exc))
+                logger.debug(f"Reader task stopped due to: {exc}")
                 break
             self._parser.feed(data)
             not self._is_upgrading and self._read_buffer()
@@ -279,4 +279,4 @@ class TcpConnection:
         self._is_upgrading = False
 
     def __repr__(self):
-        return '<TcpConnection: {}:{}'.format(self._host, self._port)
+        return f'<TcpConnection: {self._host}:{self._port}'

@@ -47,4 +47,4 @@ class NsqHTTPConnection:
 
     def __repr__(self):
         cls_name = self.__class__.__name__
-        return '<{}: {}>'.format(cls_name, self._endpoint)
+        return f'<{cls_name}: {self._endpoint}>'

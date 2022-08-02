@@ -10,29 +10,22 @@ CHANNEL_NAME_RE = re.compile(r'^[\.a-zA-Z0-9_-]+(#ephemeral)?$')
 
 def get_host_and_port(host):
     host_parsed = urlparse(host)
-    if host_parsed.scheme == 'tcp':
-        result = host_parsed.netloc
-    elif host_parsed.scheme == '':
+    if host_parsed.scheme == '':
         result = host_parsed.path
+    elif host_parsed.scheme == 'tcp':
+        result = host_parsed.netloc
     else:
         result = host
     result = result.split(':')
-    if len(result) == 2:
-        return result[0], result[-1]
-    else:
-        return result[0], None
+    return (result[0], result[-1]) if len(result) == 2 else (result[0], None)
 
 
 def valid_topic_name(topic):
-    if not 0 < len(topic) < 33:
-        return False
-    return bool(TOPIC_NAME_RE.match(topic))
+    return bool(TOPIC_NAME_RE.match(topic)) if 0 < len(topic) < 33 else False
 
 
 def valid_channel_name(channel):
-    if not 0 < len(channel) < 33:
-        return False
-    return bool(CHANNEL_NAME_RE.match(channel))
+    return bool(CHANNEL_NAME_RE.match(channel)) if 0 < len(channel) < 33 else False
 
 
 _converters_to_bytes_map = {
@@ -98,8 +91,7 @@ def retry_iterator(init_delay=0.1, max_delay=10.0, factor=2.7182818284590451,
             delay, delay * jitter) if jitter else delay
         delay = min(delay, max_delay) if max_delay else delay
         yield delay
-    else:
-        raise MaxRetriesExided()
+    raise MaxRetriesExided()
 
 
 def get_logger(log_level=None):

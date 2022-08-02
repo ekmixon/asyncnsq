@@ -9,9 +9,7 @@ NAME = 'asyncnsq'
 PACKAGE = 'asyncnsq'
 PY_VER = sys.version_info
 
-if PY_VER >= (3, 6):
-    pass
-else:
+if PY_VER < (3, 6):
     raise RuntimeError("asyncnsq doesn't support Python version prior 3.6")
 
 
@@ -28,9 +26,8 @@ def read_version():
         for line in f:
             match = regexp.match(line)
             if match is not None:
-                return match.group(1)
-        else:
-            raise RuntimeError('Cannot find version in asyncnsq/__init__.py')
+                return match[1]
+        raise RuntimeError('Cannot find version in asyncnsq/__init__.py')
 
 
 classifiers = [
@@ -53,7 +50,7 @@ if os.path.exists('README.md'):
     with open('README.md', 'r') as f:
         long_description = f.read()
 else:
-    long_description = 'See http://pypi.python.org/pypi/%s' % (NAME,)
+    long_description = f'See http://pypi.python.org/pypi/{NAME}'
 
 setup(name='asyncnsq',
       version=read_version(),

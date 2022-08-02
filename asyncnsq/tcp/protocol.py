@@ -86,8 +86,7 @@ class DeflateReader(BaseCompressReader):
 
     def compress(self, data):
         chunk = self._compressor.compress(data)
-        compressed = chunk + self._compressor.flush(zlib.Z_SYNC_FLUSH)
-        return compressed
+        return chunk + self._compressor.flush(zlib.Z_SYNC_FLUSH)
 
     def decompress(self, chunk):
         return self._decompressor.decompress(chunk)
@@ -102,8 +101,7 @@ class SnappyReader(BaseCompressReader):
         buffer and self.feed(buffer)
 
     def compress(self, data):
-        compressed = self._compressor.add_chunk(data, compress=True)
-        return compressed
+        return self._compressor.add_chunk(data, compress=True)
 
     def decompress(self, chunk):
         return self._decompressor.decompress(chunk)
@@ -111,8 +109,7 @@ class SnappyReader(BaseCompressReader):
 
 def _encode_body(data):
     _data = _convert_to_bytes(data)
-    result = struct.pack('>l', len(_data)) + _data
-    return result
+    return struct.pack('>l', len(_data)) + _data
 
 
 class Reader(BaseReader):
@@ -193,14 +190,13 @@ class Reader(BaseReader):
     def _unpack_response(self):
         start = consts.DATA_SIZE + consts.FRAME_SIZE
         end = consts.DATA_SIZE + self._payload_size
-        body = bytes(self._buffer[start:end])
-        return body
+        return bytes(self._buffer[start:end])
 
     def _unpack_message(self):
         start = consts.DATA_SIZE + consts.FRAME_SIZE
         end = consts.DATA_SIZE + self._payload_size
         msg_len = end - start - consts.MSG_HEADER
-        fmt = '>qh16s{}s'.format(msg_len)
+        fmt = f'>qh16s{msg_len}s'
         payload = struct.unpack(fmt, self._buffer[start:end])
         timestamp, attempts, msg_id, body = payload
         return timestamp, attempts, msg_id, body

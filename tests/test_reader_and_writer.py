@@ -24,7 +24,7 @@ class NsqTest(BaseTest):
                                   deflate_level=0,
                                   loop=self.loop,
                                   auth_secret=self.auth_secret)
-        for i in range(10):
+        for _ in range(10):
             pub_res = await nsq.pub('foo', 'bar')
             self.assertEqual(pub_res, b"OK")
 

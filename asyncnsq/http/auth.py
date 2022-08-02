@@ -12,8 +12,7 @@ async def create_auth_server(auth_secret, loop=None):
     initial function to get auth server
     """
     loop = loop or asyncio.get_event_loop()
-    auth_server = AuthServer(auth_secret, loop=loop)
-    return auth_server
+    return AuthServer(auth_secret, loop=loop)
 
 
 def create_dev_auth_server(argv):
